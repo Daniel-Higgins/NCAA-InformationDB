@@ -131,28 +131,33 @@ public class Signup extends javax.swing.JFrame {
         String un = jTextField1.getText().trim();
         String pw = jTextField2.getText().trim();
         String cpw = jTextField4.getText().trim();
-        
+
         jLabel6.setVisible(false);
         if (un != null && pw != null && cpw != null || un.isEmpty() && pw.isEmpty() && cpw.isEmpty()) {
-            if (pw.equals(cpw)) {
-                if (!u.checkUser(un, pw)) {//checking that these credentials dont exist
-                    if(u.checkSchool(jTextField3.getText().trim())){
-                    u.addUser(un, pw, jTextField3.getText().trim());//adding team too
-                    this.dispose();
+            if (pw.length() <= 4) {
+                jLabel6.setVisible(true);
+                jLabel6.setText("Password too small");
+            } else {
+                if (pw.equals(cpw)) {
+                    if (!u.checkUser(un, pw)) {//checking that these credentials dont exist
+                        if (u.checkSchool(jTextField3.getText().trim())) {
+                            u.addUser(un, pw, jTextField3.getText().trim());//adding team too
+                            this.dispose();
+                        } else {
+                            jLabel6.setVisible(true);
+                            jLabel6.setText("Type valid school or leave blank");
+                        }
                     } else {
                         jLabel6.setVisible(true);
-                        jLabel6.setText("Type valid school or leave blank");
+                        jLabel6.setText("User exists already");
                     }
                 } else {
                     jLabel6.setVisible(true);
-                    jLabel6.setText("User exists already");
+                    jLabel6.setText("Passwords are not equal.");
                 }
-            } else {
                 jLabel6.setVisible(true);
-                jLabel6.setText("Passwords are not equal.");
+                jLabel6.setText("You can't have empty values");
             }
-            jLabel6.setVisible(true);
-            jLabel6.setText("You can't have empty values");
         }
     }//GEN-LAST:event_SignupButtonActionPerformed
 
