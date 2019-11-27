@@ -48,7 +48,7 @@ public class API {
 
             while (kb.hasNext()) {
 
-                Schools n = new Schools(kb.next().trim(), Integer.parseInt(kb.next()), Integer.parseInt(kb.next().trim()), kb.next(), kb.next(), kb.next(), Integer.parseInt(kb.next().trim()), kb.next(), kb.next(), Double.parseDouble(kb.next()), kb.nextLine());
+                Schools n = new Schools(kb.next().trim(), Integer.parseInt(kb.next()), kb.next(), kb.next(), kb.next(), Integer.parseInt(kb.next().trim()), kb.next(), kb.next(), Double.parseDouble(kb.next()), kb.nextLine());
                 addS(n);
 
             }
