@@ -19,7 +19,7 @@ public class Schools {
         String yearsWon = "0";
         String[] closest = new String[4];
         
-        public Schools(String ran, int c, String re, String nn, String a, int p, String cit, String st, double la, String lo){
+        public Schools(String ran, int c, int d, String re, String nn, String a, int p, String cit, String st, double la, String lo){
             rank = ran;
             pop = p;
             latitude = la;
