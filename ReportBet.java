@@ -5,6 +5,20 @@
  */
 package cbb;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 /**
  *
  * @author HIGG003
@@ -16,6 +30,7 @@ public class ReportBet extends javax.swing.JFrame {
      */
     public ReportBet() {
         initComponents();
+        init();
     }
 
     /**
@@ -29,7 +44,7 @@ public class ReportBet extends javax.swing.JFrame {
 
         mLChBx = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        schoolListforRB = new javax.swing.JComboBox<>();
         ouChBx = new javax.swing.JCheckBox();
         spreadChBx = new javax.swing.JCheckBox();
         yesCB = new javax.swing.JCheckBox();
@@ -44,7 +59,7 @@ public class ReportBet extends javax.swing.JFrame {
 
         jLabel1.setText("School:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        schoolListforRB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         ouChBx.setText("Over/Under");
 
@@ -94,7 +109,7 @@ public class ReportBet extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel1)
                                         .addGap(18, 18, 18)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(schoolListforRB, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(yesCB)
                                     .addComponent(jLabel2))
                                 .addGap(0, 0, Short.MAX_VALUE))))
@@ -112,7 +127,7 @@ public class ReportBet extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(schoolListforRB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(28, 213, Short.MAX_VALUE)
@@ -142,11 +157,77 @@ public class ReportBet extends javax.swing.JFrame {
         // TODO add your handling code here:
     }                                     
 
+    final void init(){
+        try {
+            String blogUrl = "https://www.teamrankings.com/ncb/trends/ats_trends/";
+            Document doc = Jsoup.connect(blogUrl).get();
+
+            Element links = doc.select("body").get(0); // somehow grabs table
+            Elements f = links.select("td");
+            List<String> clist = f.eachText();
+            ArrayList<String> schoolName = new ArrayList<>();
+            for (int i = 0; i < clist.size(); i = i+5) {
+            /////////    //gets school, ats record, cover%, mov, ATS+/-  all randomly
+               schoolName.add(clist.get(i));
+                
+            }
+            Collections.sort(schoolName);
+            
+            for(String e: schoolName){
+                schoolListforRB.addItem(e);
+            }
+          
+        } catch (IOException e) {
+             System.out.println(e.toString());
+
+        }
+    }
+    
+    
     private void submitBetCBActionPerformed(java.awt.event.ActionEvent evt) {                                            
         //sql
+        ResultSet rs = null;
         responseLa.setVisible(false);
         if(mLChBx.isSelected() && !spreadChBx.isSelected() && !ouChBx.isSelected()){
+            try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            int uid=0;
+            //get user id for sql table entry
+            try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!") ) 
+            {
+                
+                String query = "SELECT id_user FROM account WHERE username="+UserInfo.Login.un.trim()+";";
+                PreparedStatement preparedStmt = con.prepareStatement(query);
+                preparedStmt.execute();
+                uid = rs.getInt(1);
+                
+            }
             
+            try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!") ) 
+            {
+                //once you grab id , grab bet results from checkboxes and school
+                String queryPut = "Insert INTO userGrid(id_user, school, WvS, LvS, ouW, ouL, mlW, mlL) VALUES (?,?,?,?);";
+                PreparedStatement preparedStmtput = con.prepareStatement(queryPut);
+                
+                
+                preparedStmtput.setInt(1, uid);
+                
+                if(yesCB.isSelected() && !noCB.isSelected()){
+                    //if yes box is selected
+                    preparedStmtput.setInt(7, uid);
+
+                } else if (yesCB.isSelected() && !noCB.isSelected()){
+                    //if no box is selected
+                    
+                } else {
+                    //if false entry
+                    responseLa.setText("Select possible Outcome");
+                }
+                preparedStmtput.execute();
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
             
             
             
@@ -217,13 +298,13 @@ public class ReportBet extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify                     
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox mLChBx;
     private javax.swing.JCheckBox noCB;
     private javax.swing.JCheckBox ouChBx;
     private javax.swing.JLabel responseLa;
+    private javax.swing.JComboBox<String> schoolListforRB;
     private javax.swing.JCheckBox spreadChBx;
     private javax.swing.JButton submitBetCB;
     private javax.swing.JCheckBox yesCB;
