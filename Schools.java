@@ -15,12 +15,12 @@ public class Schools {
         int oneSeed=0;
         int championships=0;
         double latitude,longitude;
-        private String name,nn,abbr,city,state, rank;
+        private String name,nn,abbr,city,state;
         String yearsWon = "0";
         String[] closest = new String[4];
         
-        public Schools(String ran, int c, int d, String re, String nn, String a, int p, String cit, String st, double la, String lo){
-            rank = ran;
+        public Schools(int c, int d, String re, String nn, String a, int p, String cit, String st, double la, String lo){
+           
             pop = p;
             latitude = la;
             String newlo = "";
