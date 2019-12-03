@@ -44,20 +44,20 @@ DefaultTableModel dtm;
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "School", "Record vSpread", "Spread Percentage", "My Spread Record", "My Spread Percentage Won", "O/U Record (Overs)", "O/U Percentage %", "Point Diff"
+                "School", "Record", "My mL record", "Record vSpread", "Spread Percentage", "My Spread Record", "My Spread Percentage Won", "O/U Record (Overs)", "O/U Percentage %", "Point Diff", "My O/U Record", "My O/U %"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, false, false, true
+                false, false, false, false, false, false, false, false, false, false, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -76,7 +76,7 @@ DefaultTableModel dtm;
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1128, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -95,8 +95,8 @@ DefaultTableModel dtm;
         dtm.setRowCount(354);
         // alg that grabs school stuff with ATS
         class Node {
-            String name, RecordSpread,recP,o3,o4,o5,o6,o7;
-            public Node(String n,String q, String w, String h, String k, String Ov, String ovPer, String pDiff){
+            String name, mlRecord, RecordSpread,recP,o3,o4,o5,o6,o7;
+            public Node(String n,String q, String w, String h, String k, String Ov, String ovPer, String pDiff, String ml){
                 name = n;
                 RecordSpread=q;
                 recP=w;
@@ -105,6 +105,7 @@ DefaultTableModel dtm;
                 o5=Ov;
                 o6=ovPer;
                 o7=pDiff;
+                mlRecord=ml;
             }
         }
         ArrayList<Node> lines = null;
@@ -119,7 +120,7 @@ DefaultTableModel dtm;
             for (int i = 0; i < clist.size(); i = i+5) {
                 //gets school, ats record, cover%, mov, ATS+/-  all randomly
                //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
-                Node n = new Node(clist.get(i),clist.get(i+1) , clist.get(i+2), clist.get(i+3),clist.get(i+4),null,null,null);
+                Node n = new Node(clist.get(i),clist.get(i+1) , clist.get(i+2), clist.get(i+3),clist.get(i+4),null,null,null,null);
                 
                 lines.add(n);
             }
@@ -129,6 +130,29 @@ DefaultTableModel dtm;
              System.out.println(e.toString());
 
         }
+        //https://www.teamrankings.com/ncb/trends/win_trends/
+        try {
+            String blogUrl = "https://www.teamrankings.com/ncb/trends/win_trends/";
+            Document doc = Jsoup.connect(blogUrl).get();
+
+            Element links = doc.select("body").get(0); // somehow grabs table
+            Elements f = links.select("td");
+            List<String> clist = f.eachText();
+           
+            for (int i = 0; i < clist.size(); i = i+5) {
+                
+               
+               for(Node e: lines){
+                   if (e.name.equalsIgnoreCase(clist.get(i))){
+                       e.mlRecord = clist.get(i+1);
+                   }
+               }
+            }
+        }catch(IOException ex){
+            
+        }
+        
+        
         
         //https://www.teamrankings.com/ncb/trends/ou_trends/
         try {
@@ -141,8 +165,8 @@ DefaultTableModel dtm;
            
             for (int i = 0; i < clist.size(); i = i+5) {
                 
-                //gets school, ats record, cover%, mov, ATS+/-  all randomly
-               System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
+                
+               //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
                for(Node e: lines){
                    if (e.name.equalsIgnoreCase(clist.get(i))){
                        e.o5 = clist.get(i+1);
@@ -151,15 +175,18 @@ DefaultTableModel dtm;
                    }
                }
             }
+            
+            
 
             
             for (int k = 0; k < lines.size(); k++) {
                 jTable1.setValueAt(lines.get(k).name, k, 0);
-                jTable1.setValueAt(lines.get(k).RecordSpread, k, 1);
-                jTable1.setValueAt(lines.get(k).recP, k, 2);
-                jTable1.setValueAt(lines.get(k).o5, k, 5);
-                jTable1.setValueAt(lines.get(k).o6, k, 6);
-                jTable1.setValueAt(lines.get(k).o7, k, 7);
+                jTable1.setValueAt(lines.get(k).mlRecord, k, 1);
+                jTable1.setValueAt(lines.get(k).RecordSpread, k, 3);
+                jTable1.setValueAt(lines.get(k).recP, k, 4);
+                jTable1.setValueAt(lines.get(k).o5, k, 7);
+                jTable1.setValueAt(lines.get(k).o6, k, 8);
+                jTable1.setValueAt(lines.get(k).o7, k, 9);
             } 
             
         } catch (IOException e) {
@@ -211,4 +238,3 @@ DefaultTableModel dtm;
     private javax.swing.JTable jTable1;
     // End of variables declaration                   
 }
-
