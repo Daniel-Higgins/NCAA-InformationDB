@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,7 +33,7 @@ public class ReportBet extends javax.swing.JFrame {
         initComponents();
         init();
     }
-
+    Random r = new Random();
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,7 +158,7 @@ public class ReportBet extends javax.swing.JFrame {
         // TODO add your handling code here:
     }                                     
 
-    final void init(){
+    final void init() {
         try {
             String blogUrl = "https://www.teamrankings.com/ncb/trends/ats_trends/";
             Document doc = Jsoup.connect(blogUrl).get();
@@ -166,99 +167,90 @@ public class ReportBet extends javax.swing.JFrame {
             Elements f = links.select("td");
             List<String> clist = f.eachText();
             ArrayList<String> schoolName = new ArrayList<>();
-            for (int i = 0; i < clist.size(); i = i+5) {
-            /////////    //gets school, ats record, cover%, mov, ATS+/-  all randomly
-               schoolName.add(clist.get(i));
-                
+            for (int i = 0; i < clist.size(); i = i + 5) {
+                /////////    //gets school, ats record, cover%, mov, ATS+/-  all randomly
+                schoolName.add(clist.get(i));
+
             }
             Collections.sort(schoolName);
-            
-            for(String e: schoolName){
+
+            for (String e : schoolName) {
                 schoolListforRB.addItem(e);
             }
-          
+
         } catch (IOException e) {
-             System.out.println(e.toString());
+            System.out.println(e.toString());
 
         }
     }
-    
-    
+
+
     private void submitBetCBActionPerformed(java.awt.event.ActionEvent evt) {                                            
         //sql
-        ResultSet rs = null;
+        ResultSet rs, rs1 = null;
         responseLa.setVisible(false);
-        if(mLChBx.isSelected() && !spreadChBx.isSelected() && !ouChBx.isSelected()){
+        if (mLChBx.isSelected() && !spreadChBx.isSelected() && !ouChBx.isSelected()) {
+            //if moneyline bet is selected
             try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            int uid=0;
-            //get user id for sql table entry
-            try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!") ) 
-            {
-                
-                String query = "SELECT id_user FROM account WHERE username="+UserInfo.Login.un.trim()+";";
-                PreparedStatement preparedStmt = con.prepareStatement(query);
-                preparedStmt.execute();
-                uid = rs.getInt(1);
-                
-            }
-            
-            try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!") ) 
-            {
-                //once you grab id , grab bet results from checkboxes and school
-                String queryPut = "Insert INTO userGrid(id_user, school, WvS, LvS, ouW, ouL, mlW, mlL) VALUES (?,?,?,?);";
-                PreparedStatement preparedStmtput = con.prepareStatement(queryPut);
-                
-                
-                preparedStmtput.setInt(1, uid);
-                
-                if(yesCB.isSelected() && !noCB.isSelected()){
-                    //if yes box is selected
-                    preparedStmtput.setInt(7, uid);
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                int uid = 0;
 
-                } else if (yesCB.isSelected() && !noCB.isSelected()){
-                    //if no box is selected
-                    
-                } else {
-                    //if false entry
-                    responseLa.setText("Select possible Outcome");
+                //get user id for sql table entry
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!")) {
+                    String query = "SELECT id_user FROM account WHERE username=" + UserInfo.Login.un.trim() + ";";
+                    PreparedStatement preparedStmt = con.prepareStatement(query);
+                    preparedStmt.execute();
+                    rs = preparedStmt.getResultSet();
+                    uid = rs.getInt(1);
                 }
-                preparedStmtput.execute();
+
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!")) {
+                    //once you grab id , grab bet results from checkboxes and school
+                    String queryPut = "Insert INTO userGrid(bet_id, id_user, school, WvS, LvS, ouW, ouL, mlW, mlL) VALUES (?,?,?,?,?,?,?,?);";
+                    PreparedStatement preparedStmtput = con.prepareStatement(queryPut);
+
+                    preparedStmtput.setInt(2, uid);
+                    preparedStmtput.setString(3, (String) schoolListforRB.getSelectedItem());
+
+                    if (yesCB.isSelected() && !noCB.isSelected()) {
+                        //if yes box is selected
+                        preparedStmtput.setInt(4, 0);//wvs
+                        preparedStmtput.setInt(5, 0);//lvs
+                        preparedStmtput.setInt(6, 0);//ouW
+                        preparedStmtput.setInt(7, 0);//ouL
+                        preparedStmtput.setInt(8, 1);//mlw
+                        preparedStmtput.setInt(9, 0);//mlL
+                    } else if (!yesCB.isSelected() && noCB.isSelected()) {
+                        //if no box is selected
+                        preparedStmtput.setInt(4, 0);//wvs
+                        preparedStmtput.setInt(5, 0);//lvs
+                        preparedStmtput.setInt(6, 0);//ouW
+                        preparedStmtput.setInt(7, 0);//ouL
+                        preparedStmtput.setInt(8, 0);//mlw
+                        preparedStmtput.setInt(9, 1);//mlL
+                        
+                    } else {
+                        //if false entry
+                        responseLa.setText("Select possible Outcome");
+                    }
+                    preparedStmtput.execute();
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
             }
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-            
-            
-            
-            
+
             this.setVisible(false);
-        } else if(!mLChBx.isSelected() && spreadChBx.isSelected() && !ouChBx.isSelected()){
-            
-            
-            
-            
-            
+        } else if (!mLChBx.isSelected() && spreadChBx.isSelected() && !ouChBx.isSelected()) {
+
             this.setVisible(false);
-        } else if (!mLChBx.isSelected() && !spreadChBx.isSelected() && ouChBx.isSelected()){
-            
-            
-            
-            
-            
-            
+        } else if (!mLChBx.isSelected() && !spreadChBx.isSelected() && ouChBx.isSelected()) {
+
             this.setVisible(false);
         } else {
             responseLa.setVisible(true);
             responseLa.setText("Please select valid bet");
         }
-        
-        
-        
-        
-        
-        
-        
+
         this.setVisible(false);
     }                                           
 
@@ -310,4 +302,5 @@ public class ReportBet extends javax.swing.JFrame {
     private javax.swing.JCheckBox yesCB;
     // End of variables declaration                   
 }
+
 
