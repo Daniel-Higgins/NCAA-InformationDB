@@ -13,6 +13,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import java.sql.*;
 
 /**
  *
@@ -27,7 +28,8 @@ public class Trends extends javax.swing.JFrame {
         initComponents();
         init();
     }
-DefaultTableModel dtm;
+    DefaultTableModel dtm;
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -42,6 +44,7 @@ DefaultTableModel dtm;
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jTable1.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null, null, null, null, null},
@@ -83,29 +86,34 @@ DefaultTableModel dtm;
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>                        
 
-    private void init(){
+    private void init() {
         dtm = (DefaultTableModel) jTable1.getModel();
         dtm.setRowCount(354);
         // alg that grabs school stuff with ATS
         class Node {
-            String name, mlRecord, RecordSpread,recP,o3,o4,o5,o6,o7;
-            public Node(String n,String q, String w, String h, String k, String Ov, String ovPer, String pDiff, String ml){
+
+            String name, mlRecord, RecordSpread, recP, o3, o4, o5, o6, o7, myMLrecord, mySpreadrecord, myOUrecord;
+
+            public Node(String n, String q, String w, String h, String k, String Ov, String ovPer, String pDiff, String ml, String myMLr, String mySr, String myOUr) {
                 name = n;
-                RecordSpread=q;
-                recP=w;
-                o3=h; //doesnt matter
-                o4=k;//doesnt matter
-                o5=Ov;
-                o6=ovPer;
-                o7=pDiff;
-                mlRecord=ml;
+                RecordSpread = q;
+                recP = w;
+                o3 = h; //doesnt matter
+                o4 = k;//doesnt matter
+                o5 = Ov;
+                o6 = ovPer;
+                o7 = pDiff;
+                mlRecord = ml;
+                myMLrecord = myMLr;
+                mySpreadrecord = mySr;
+                myOUrecord = myOUr;
             }
         }
         ArrayList<Node> lines = null;
@@ -117,17 +125,16 @@ DefaultTableModel dtm;
             Elements f = links.select("td");
             List<String> clist = f.eachText();
             lines = new ArrayList<>();
-            for (int i = 0; i < clist.size(); i = i+5) {
+            for (int i = 0; i < clist.size(); i = i + 5) {
                 //gets school, ats record, cover%, mov, ATS+/-  all randomly
-               //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
-                Node n = new Node(clist.get(i),clist.get(i+1) , clist.get(i+2), clist.get(i+3),clist.get(i+4),null,null,null,null);
-                
+                //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
+                Node n = new Node(clist.get(i), clist.get(i + 1), clist.get(i + 2), clist.get(i + 3), clist.get(i + 4), null, null, null, null,null,null,null);
+
                 lines.add(n);
             }
-            
-          
+
         } catch (IOException e) {
-             System.out.println(e.toString());
+            System.out.println(e.toString());
 
         }
         //https://www.teamrankings.com/ncb/trends/win_trends/
@@ -138,22 +145,19 @@ DefaultTableModel dtm;
             Element links = doc.select("body").get(0); // somehow grabs table
             Elements f = links.select("td");
             List<String> clist = f.eachText();
-           
-            for (int i = 0; i < clist.size(); i = i+5) {
-                
-               
-               for(Node e: lines){
-                   if (e.name.equalsIgnoreCase(clist.get(i))){
-                       e.mlRecord = clist.get(i+1);
-                   }
-               }
+
+            for (int i = 0; i < clist.size(); i = i + 5) {
+
+                for (Node e : lines) {
+                    if (e.name.equalsIgnoreCase(clist.get(i))) {
+                        e.mlRecord = clist.get(i + 1);
+                    }
+                }
             }
-        }catch(IOException ex){
-            
+        } catch (IOException ex) {
+
         }
-        
-        
-        
+
         //https://www.teamrankings.com/ncb/trends/ou_trends/
         try {
             String blogUrl = "https://www.teamrankings.com/ncb/trends/ou_trends/";
@@ -162,23 +166,54 @@ DefaultTableModel dtm;
             Element links = doc.select("body").get(0); // somehow grabs table
             Elements f = links.select("td");
             List<String> clist = f.eachText();
-           
-            for (int i = 0; i < clist.size(); i = i+5) {
+
+            for (int i = 0; i < clist.size(); i = i + 5) {
+
+                //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
+                for (Node e : lines) {
+                    if (e.name.equalsIgnoreCase(clist.get(i))) {
+                        e.o5 = clist.get(i + 1);
+                        e.o6 = clist.get(i + 2);
+                        e.o7 = clist.get(i + 4);
+                    }
+                }
+            }
+            
+            
+            
+            //ResultSet rs = null;
+            
+            
+            /*
+            Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!");
+            //here s38f1 is database name, root is username and password=+ 
+            String q = "SELECT school, sum(mlW) , sum(mlL), sum(wvS), sum(lvS), sum(wvOU), sum(lvOU) FROM userGrid GROUP BY school";
+            PreparedStatement pst = con.prepareStatement(q);
+            pst.execute();
+            rs = pst.getResultSet();
+            
+            int i=1;
+            String tempp = "0";
+            while(rs.next()){
+            //grab ml and stuff records from db and putting them tg to put them on TrendsTable
+                for(Node e: lines){
+                    if(rs.getString(1).trim().equalsIgnoreCase(e.name)){
+                        if(!rs.getString(2) == null && !rs.getString(3) == null){
+                            if(
+                                e.myMLrecord = String.valueOf(
+                        }
+            
+            
+                        e.mySpreadrecord = 
+                        e.myOUrecord = 
                 
-                
-               //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
-               for(Node e: lines){
-                   if (e.name.equalsIgnoreCase(clist.get(i))){
-                       e.o5 = clist.get(i+1);
-                       e.o6 = clist.get(i+2);
-                       e.o7 = clist.get(i+4);
-                   }
-               }
             }
             
             
 
+            */
             
+
             for (int k = 0; k < lines.size(); k++) {
                 jTable1.setValueAt(lines.get(k).name, k, 0);
                 jTable1.setValueAt(lines.get(k).mlRecord, k, 1);
@@ -187,16 +222,19 @@ DefaultTableModel dtm;
                 jTable1.setValueAt(lines.get(k).o5, k, 7);
                 jTable1.setValueAt(lines.get(k).o6, k, 8);
                 jTable1.setValueAt(lines.get(k).o7, k, 9);
-            } 
-            
+            }
+
         } catch (IOException e) {
-             System.out.println(e.toString());
+            System.out.println(e.toString());
 
         }
+
+        //grab SQLdatabase numbers for user bet records
         
-        
+
+       
     }
-        
+
     /**
      * @param args the command line arguments
      */
