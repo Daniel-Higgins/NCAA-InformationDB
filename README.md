@@ -13,5 +13,7 @@ School lookup is a reference to any school the user types in. Once a user types,
 display the school name, city, state, closest related schools based on location, total championships, years won, and total #1 
 seeds.
 
+*currently adding gambling references*
+*.....more to come*
 
 Written in Netbeans by Daniel Higgins. (No affiliation with NCAA).
