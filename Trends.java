@@ -128,7 +128,7 @@ public class Trends extends javax.swing.JFrame {
             for (int i = 0; i < clist.size(); i = i + 5) {
                 //gets school, ats record, cover%, mov, ATS+/-  all randomly
                 //System.out.println(clist.get(i) + " " + clist.get(i+1) + " " + clist.get(i+2)+ " " + clist.get(i+3)+ " " + clist.get(i+4));
-                Node n = new Node(clist.get(i), clist.get(i + 1), clist.get(i + 2), clist.get(i + 3), clist.get(i + 4), null, null, null, null,null,null,null);
+                Node n = new Node(clist.get(i), clist.get(i + 1), clist.get(i + 2), clist.get(i + 3), clist.get(i + 4), null, null, null, null, null, null, null);
 
                 lines.add(n);
             }
@@ -178,50 +178,65 @@ public class Trends extends javax.swing.JFrame {
                     }
                 }
             }
-            
-            
-            
-            //ResultSet rs = null;
-            
-            
+
             /*
-            Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!");
-            //here s38f1 is database name, root is username and password=+ 
-            String q = "SELECT school, sum(mlW) , sum(mlL), sum(wvS), sum(lvS), sum(wvOU), sum(lvOU) FROM userGrid GROUP BY school";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.execute();
-            rs = pst.getResultSet();
+            try {
+                ResultSet rs = null;
+                Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!");
+                //here s38f1 is database name, root is username and password=+ 
+                String q = "SELECT school, sum(mlW) , sum(mlL), sum(wvS), sum(lvS), sum(wvOU), sum(lvOU) FROM userGrid GROUP BY school";
+                PreparedStatement pst = con.prepareStatement(q);
+                pst.execute();
+                rs = pst.getResultSet();
+
+                int i = 1;
+                String tempp = "0";
+                while (rs.next()) {
+                    //grab ml and stuff records from db and putting them tg to put them on TrendsTable
+                    for (Node e : lines) {
+                        if (rs.getString(1).trim().equalsIgnoreCase(e.name)) {
+                            if (rs.getString(2) == null && rs.getString(3) == null) {
+                                e.myMLrecord = "";
+                            } 
+                            
+                            if (rs.getString(4) == null && rs.getString(5) == null) {
+                                e.mySpreadrecord = "";
+                            } 
+                            if (rs.getString(6) == null && rs.getString(7) == null) {
+                                e.myOUrecord = "";
+                            }
+
             
-            int i=1;
-            String tempp = "0";
-            while(rs.next()){
-            //grab ml and stuff records from db and putting them tg to put them on TrendsTable
-                for(Node e: lines){
-                    if(rs.getString(1).trim().equalsIgnoreCase(e.name)){
-                        if(!rs.getString(2) == null && !rs.getString(3) == null){
-                            if(
-                                e.myMLrecord = String.valueOf(
+                            if (!rs.getInt(2) == null && !rs.getInt(3) == null) {
+                                  e.myMLrecord = String.valueOf(rs.getInt(2)) + " - " + String.valueOf(rs.getInt(2));
+                            } 
+                            if (!rs.getInt(4) == null && !rs.getInt(5) == null) {
+                                  e.mySpreadrecord = String.valueOf(rs.getInt(3)) + " - " + String.valueOf(rs.getInt(4));
+                            } 
+                            if (!rs.getInt(6) == null && !rs.getInt(7) == null) {
+                                  e.myOUrecord = String.valueOf(rs.getInt(6)) + " - " + String.valueOf(rs.getInt(7));
+                            } 
+
                         }
-            
-            
-                        e.mySpreadrecord = 
-                        e.myOUrecord = 
-                
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            
-            
-
-            */
-            
-
+             */
             for (int k = 0; k < lines.size(); k++) {
                 jTable1.setValueAt(lines.get(k).name, k, 0);
                 jTable1.setValueAt(lines.get(k).mlRecord, k, 1);
+                //jTable1.setValueAt(lines.get(k).myMLrecord, k, 2);
                 jTable1.setValueAt(lines.get(k).RecordSpread, k, 3);
                 jTable1.setValueAt(lines.get(k).recP, k, 4);
+                //jTable1.setValueAt(lines.get(k).mySpreadrecord, k, 5);
+                //do math for spot 6    %%%
                 jTable1.setValueAt(lines.get(k).o5, k, 7);
                 jTable1.setValueAt(lines.get(k).o6, k, 8);
                 jTable1.setValueAt(lines.get(k).o7, k, 9);
+                //jTable1.setValueAt(lines.get(k).myOUrecord, k, 10);
+                //do math for 11
             }
 
         } catch (IOException e) {
@@ -230,9 +245,6 @@ public class Trends extends javax.swing.JFrame {
         }
 
         //grab SQLdatabase numbers for user bet records
-        
-
-       
     }
 
     /**
