@@ -60,7 +60,8 @@ public class ReportBet extends javax.swing.JFrame {
 
         jLabel1.setText("School:");
 
-        schoolListforRB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        schoolListforRB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { }));
+        schoolListforRB.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         ouChBx.setText("Over/Under");
 
@@ -189,6 +190,7 @@ public class ReportBet extends javax.swing.JFrame {
         //sql
         ResultSet rs, rs1 = null;
         responseLa.setVisible(false);
+        boolean x = false; //sets the session to close if completed bet
         if (mLChBx.isSelected() && !spreadChBx.isSelected() && !ouChBx.isSelected()) {
             //if moneyline bet is selected
             try {
@@ -196,38 +198,41 @@ public class ReportBet extends javax.swing.JFrame {
                 int uid = 0;
 
                 //get user id for sql table entry
-                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!")) {
-                    String query = "SELECT id_user FROM account WHERE username=" + UserInfo.Login.un.trim() + ";";
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!")) {
+                    String query = "SELECT user_id FROM account WHERE username= '" + UserInfo.Login.un.trim() + "';";
                     PreparedStatement preparedStmt = con.prepareStatement(query);
                     preparedStmt.execute();
                     rs = preparedStmt.getResultSet();
+                    if(rs.next()){
                     uid = rs.getInt(1);
+                    }
                 }
+                int betId = r.nextInt(900000000);
 
-                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!")) {
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!")) {
                     //once you grab id , grab bet results from checkboxes and school
-                    String queryPut = "Insert INTO userGrid(bet_id, id_user, school, WvS, LvS, ouW, ouL, mlW, mlL) VALUES (?,?,?,?,?,?,?,?);";
+                    String queryPut = "Insert INTO userGrid(bet_id, user_id, school, mlW, mlL, wvS, lvS, ouW, ouL) VALUES (?,?,?,?,?,?,?,?,?);";
                     PreparedStatement preparedStmtput = con.prepareStatement(queryPut);
-
+                    preparedStmtput.setInt(1, betId);
                     preparedStmtput.setInt(2, uid);
                     preparedStmtput.setString(3, (String) schoolListforRB.getSelectedItem());
 
                     if (yesCB.isSelected() && !noCB.isSelected()) {
                         //if yes box is selected
-                        preparedStmtput.setInt(4, 0);//wvs
-                        preparedStmtput.setInt(5, 0);//lvs
-                        preparedStmtput.setInt(6, 0);//ouW
-                        preparedStmtput.setInt(7, 0);//ouL
-                        preparedStmtput.setInt(8, 1);//mlw
-                        preparedStmtput.setInt(9, 0);//mlL
+                        preparedStmtput.setInt(4, 1);//mlw
+                        preparedStmtput.setInt(5, 0);//mlL
+                        preparedStmtput.setInt(6, 0);//wvW
+                        preparedStmtput.setInt(7, 0);//lvL
+                        preparedStmtput.setInt(8, 0);//ouw
+                        preparedStmtput.setInt(9, 0);//ouL
                     } else if (!yesCB.isSelected() && noCB.isSelected()) {
                         //if no box is selected
-                        preparedStmtput.setInt(4, 0);//wvs
-                        preparedStmtput.setInt(5, 0);//lvs
-                        preparedStmtput.setInt(6, 0);//ouW
-                        preparedStmtput.setInt(7, 0);//ouL
-                        preparedStmtput.setInt(8, 0);//mlw
-                        preparedStmtput.setInt(9, 1);//mlL
+                        preparedStmtput.setInt(4, 0);//mlW
+                        preparedStmtput.setInt(5, 1);//mlL
+                        preparedStmtput.setInt(6, 0);//wvW
+                        preparedStmtput.setInt(7, 0);//lvL
+                        preparedStmtput.setInt(8, 0);//ouw
+                        preparedStmtput.setInt(9, 0);//ouL
                         
                     } else {
                         //if false entry
@@ -249,9 +254,12 @@ public class ReportBet extends javax.swing.JFrame {
         } else {
             responseLa.setVisible(true);
             responseLa.setText("Please select valid bet");
+            x = true;
         }
-
-        this.setVisible(false);
+        
+            this.setVisible(x);
+        
+        
     }                                           
 
     /**
@@ -302,5 +310,3 @@ public class ReportBet extends javax.swing.JFrame {
     private javax.swing.JCheckBox yesCB;
     // End of variables declaration                   
 }
-
-
