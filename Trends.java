@@ -231,12 +231,12 @@ public class Trends extends javax.swing.JFrame {
                 jTable1.setValueAt(lines.get(k).RecordSpread, k, 3);
                 jTable1.setValueAt(lines.get(k).recP, k, 4);
                 //jTable1.setValueAt(lines.get(k).mySpreadrecord, k, 5);
-                //do math for spot 6    %%%
+                //jTable1.setValueAt(mlPercentage, k, 6);
                 jTable1.setValueAt(lines.get(k).o5, k, 7);
                 jTable1.setValueAt(lines.get(k).o6, k, 8);
                 jTable1.setValueAt(lines.get(k).o7, k, 9);
                 //jTable1.setValueAt(lines.get(k).myOUrecord, k, 10);
-                //do math for 11
+                //jTable1.setValueAt(ouPer, k, 11);
             }
 
         } catch (IOException e) {
