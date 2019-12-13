@@ -180,6 +180,9 @@ public class Trends extends javax.swing.JFrame {
             }
 
             /*
+            int sum,a,b=0;
+            double mlPercentage, ouPer = 0.0;
+            
             try {
                 ResultSet rs = null;
                 Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!");
@@ -208,12 +211,20 @@ public class Trends extends javax.swing.JFrame {
 
             
                             if (!rs.getInt(2) == null && !rs.getInt(3) == null) {
-                                  e.myMLrecord = String.valueOf(rs.getInt(2)) + " - " + String.valueOf(rs.getInt(2));
+                                    a=rs.getInt(2);
+                                    b=rs.getInt(3);
+                                    sum=a+b;
+                                    mlPercentage = a/sum;
+                                  e.myMLrecord = String.valueOf(rs.getInt(2)) + " - " + String.valueOf(rs.getInt(3));
                             } 
                             if (!rs.getInt(4) == null && !rs.getInt(5) == null) {
-                                  e.mySpreadrecord = String.valueOf(rs.getInt(3)) + " - " + String.valueOf(rs.getInt(4));
+                                  e.mySpreadrecord = String.valueOf(rs.getInt(4)) + " - " + String.valueOf(rs.getInt(5));
                             } 
                             if (!rs.getInt(6) == null && !rs.getInt(7) == null) {
+                                    a=rs.getInt(6);
+                                    b=rs.getInt(7);
+                                    sum=a+b;
+                                    ouPer=a/sum;
                                   e.myOUrecord = String.valueOf(rs.getInt(6)) + " - " + String.valueOf(rs.getInt(7));
                             } 
 
