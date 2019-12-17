@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.sql.*;
 
+
 /**
  *
  * @author HIGG003
@@ -179,48 +180,40 @@ public class Trends extends javax.swing.JFrame {
                 }
             }
 
-            /*
-            int sum,a,b=0;
-            double mlPercentage, ouPer = 0.0;
+            
+            int sum=0,a=0,b=0;
+            double mlPercentage= 0.0, ouPer = 0.0;
             
             try {
                 ResultSet rs = null;
-                Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/userTable", "admin", "Teacher1!");
+                Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!");
                 //here s38f1 is database name, root is username and password=+ 
-                String q = "SELECT school, sum(mlW) , sum(mlL), sum(wvS), sum(lvS), sum(wvOU), sum(lvOU) FROM userGrid GROUP BY school";
+                String q = "SELECT school, sum(mlW) , sum(mlL), sum(wvS), sum(lvS), sum(ouW), sum(ouL) FROM userGrid WHERE user_id=? GROUP BY school";
                 PreparedStatement pst = con.prepareStatement(q);
+                pst.setInt(1, UserInfo.Login.getUserId());
                 pst.execute();
                 rs = pst.getResultSet();
-
+                rs.next();
+                System.out.println(rs.getString(1));
                 int i = 1;
                 String tempp = "0";
                 while (rs.next()) {
                     //grab ml and stuff records from db and putting them tg to put them on TrendsTable
                     for (Node e : lines) {
-                        if (rs.getString(1).trim().equalsIgnoreCase(e.name)) {
-                            if (rs.getString(2) == null && rs.getString(3) == null) {
-                                e.myMLrecord = "";
-                            } 
-                            
-                            if (rs.getString(4) == null && rs.getString(5) == null) {
-                                e.mySpreadrecord = "";
-                            } 
-                            if (rs.getString(6) == null && rs.getString(7) == null) {
-                                e.myOUrecord = "";
-                            }
-
+                        System.out.println(e.name + " | " + rs.getString(1));
+                        if (e.name.equalsIgnoreCase(rs.getString(1))) {
             
-                            if (!rs.getInt(2) == null && !rs.getInt(3) == null) {
+                            if (rs.getInt(2) != 0 || rs.getInt(3) != 0) {                              
                                     a=rs.getInt(2);
                                     b=rs.getInt(3);
                                     sum=a+b;
                                     mlPercentage = a/sum;
                                   e.myMLrecord = String.valueOf(rs.getInt(2)) + " - " + String.valueOf(rs.getInt(3));
                             } 
-                            if (!rs.getInt(4) == null && !rs.getInt(5) == null) {
+                            if (rs.getInt(4) != 0 || rs.getInt(5) != 0) {
                                   e.mySpreadrecord = String.valueOf(rs.getInt(4)) + " - " + String.valueOf(rs.getInt(5));
                             } 
-                            if (!rs.getInt(6) == null && !rs.getInt(7) == null) {
+                            if (rs.getInt(6) != 0 || rs.getInt(7) != 0) {
                                     a=rs.getInt(6);
                                     b=rs.getInt(7);
                                     sum=a+b;
@@ -234,20 +227,21 @@ public class Trends extends javax.swing.JFrame {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-             */
+            
+            System.out.println("Sum " + sum + " OUper " + ouPer);
             for (int k = 0; k < lines.size(); k++) {
                 jTable1.setValueAt(lines.get(k).name, k, 0);
                 jTable1.setValueAt(lines.get(k).mlRecord, k, 1);
-                //jTable1.setValueAt(lines.get(k).myMLrecord, k, 2);
+                jTable1.setValueAt(lines.get(k).myMLrecord, k, 2);
                 jTable1.setValueAt(lines.get(k).RecordSpread, k, 3);
                 jTable1.setValueAt(lines.get(k).recP, k, 4);
-                //jTable1.setValueAt(lines.get(k).mySpreadrecord, k, 5);
-                //jTable1.setValueAt(mlPercentage, k, 6);
+                jTable1.setValueAt(lines.get(k).mySpreadrecord, k, 5);
+                jTable1.setValueAt(mlPercentage, k, 6);
                 jTable1.setValueAt(lines.get(k).o5, k, 7);
                 jTable1.setValueAt(lines.get(k).o6, k, 8);
                 jTable1.setValueAt(lines.get(k).o7, k, 9);
-                //jTable1.setValueAt(lines.get(k).myOUrecord, k, 10);
-                //jTable1.setValueAt(ouPer, k, 11);
+                jTable1.setValueAt(lines.get(k).myOUrecord, k, 10);
+                jTable1.setValueAt(ouPer, k, 11);
             }
 
         } catch (IOException e) {
