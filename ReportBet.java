@@ -225,6 +225,7 @@ public class ReportBet extends javax.swing.JFrame {
                         preparedStmtput.setInt(7, 0);//lvL
                         preparedStmtput.setInt(8, 0);//ouw
                         preparedStmtput.setInt(9, 0);//ouL
+                        preparedStmtput.execute();
                     } else if (!yesCB.isSelected() && noCB.isSelected()) {
                         //if no box is selected
                         preparedStmtput.setInt(4, 0);//mlW
@@ -233,12 +234,12 @@ public class ReportBet extends javax.swing.JFrame {
                         preparedStmtput.setInt(7, 0);//lvL
                         preparedStmtput.setInt(8, 0);//ouw
                         preparedStmtput.setInt(9, 0);//ouL
-                        
+                        preparedStmtput.execute();
                     } else {
                         //if false entry
                         responseLa.setText("Select possible Outcome");
                     }
-                    preparedStmtput.execute();
+                   
                 }
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
@@ -246,10 +247,116 @@ public class ReportBet extends javax.swing.JFrame {
 
             this.setVisible(false);
         } else if (!mLChBx.isSelected() && spreadChBx.isSelected() && !ouChBx.isSelected()) {
+            //if spread bet is selected
+            
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                int uid = 0;
 
+                //get user id for sql table entry
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!")) {
+                    String query = "SELECT user_id FROM account WHERE username= '" + UserInfo.Login.un.trim() + "';";
+                    PreparedStatement preparedStmt = con.prepareStatement(query);
+                    preparedStmt.execute();
+                    rs = preparedStmt.getResultSet();
+                    if(rs.next()){
+                    uid = rs.getInt(1);
+                    }
+                }
+                int betId = r.nextInt(900000000);
+
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!")) {
+                    //once you grab id , grab bet results from checkboxes and school
+                    String queryPut = "Insert INTO userGrid(bet_id, user_id, school, mlW, mlL, wvS, lvS, ouW, ouL) VALUES (?,?,?,?,?,?,?,?,?);";
+                    PreparedStatement preparedStmtput = con.prepareStatement(queryPut);
+                    preparedStmtput.setInt(1, betId);
+                    preparedStmtput.setInt(2, uid);
+                    preparedStmtput.setString(3, (String) schoolListforRB.getSelectedItem());
+
+                    if (yesCB.isSelected() && !noCB.isSelected()) {
+                        //if yes box is selected
+                        preparedStmtput.setInt(4, 0);//mlw
+                        preparedStmtput.setInt(5, 0);//mlL
+                        preparedStmtput.setInt(6, 1);//wvW
+                        preparedStmtput.setInt(7, 0);//lvL
+                        preparedStmtput.setInt(8, 0);//ouw
+                        preparedStmtput.setInt(9, 0);//ouL
+                        preparedStmtput.execute();
+                    } else if (!yesCB.isSelected() && noCB.isSelected()) {
+                        //if no box is selected
+                        preparedStmtput.setInt(4, 0);//mlW
+                        preparedStmtput.setInt(5, 0);//mlL
+                        preparedStmtput.setInt(6, 0);//wvW
+                        preparedStmtput.setInt(7, 1);//lvL
+                        preparedStmtput.setInt(8, 0);//ouw
+                        preparedStmtput.setInt(9, 0);//ouL
+                        preparedStmtput.execute();
+                    } else {
+                        //if false entry
+                        responseLa.setText("Select possible Outcome");
+                    }
+                    
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
+            }
+            
             this.setVisible(false);
         } else if (!mLChBx.isSelected() && !spreadChBx.isSelected() && ouChBx.isSelected()) {
+                //ou
+                try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                int uid = 0;
 
+                //get user id for sql table entry
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!")) {
+                    String query = "SELECT user_id FROM account WHERE username= '" + UserInfo.Login.un.trim() + "';";
+                    PreparedStatement preparedStmt = con.prepareStatement(query);
+                    preparedStmt.execute();
+                    rs = preparedStmt.getResultSet();
+                    if(rs.next()){
+                    uid = rs.getInt(1);
+                    }
+                }
+                int betId = r.nextInt(900000000);
+
+                try (Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!")) {
+                    //once you grab id , grab bet results from checkboxes and school
+                    String queryPut = "Insert INTO userGrid(bet_id, user_id, school, mlW, mlL, wvS, lvS, ouW, ouL) VALUES (?,?,?,?,?,?,?,?,?);";
+                    PreparedStatement preparedStmtput = con.prepareStatement(queryPut);
+                    preparedStmtput.setInt(1, betId);
+                    preparedStmtput.setInt(2, uid);
+                    preparedStmtput.setString(3, (String) schoolListforRB.getSelectedItem());
+
+                    if (yesCB.isSelected() && !noCB.isSelected()) {
+                        //if yes box is selected
+                        preparedStmtput.setInt(4, 0);//mlw
+                        preparedStmtput.setInt(5, 0);//mlL
+                        preparedStmtput.setInt(6, 0);//wvW
+                        preparedStmtput.setInt(7, 0);//lvL
+                        preparedStmtput.setInt(8, 1);//ouw
+                        preparedStmtput.setInt(9, 0);//ouL
+                        preparedStmtput.execute();
+                    } else if (!yesCB.isSelected() && noCB.isSelected()) {
+                        //if no box is selected
+                        preparedStmtput.setInt(4, 0);//mlW
+                        preparedStmtput.setInt(5, 0);//mlL
+                        preparedStmtput.setInt(6, 0);//wvW
+                        preparedStmtput.setInt(7, 0);//lvL
+                        preparedStmtput.setInt(8, 0);//ouw
+                        preparedStmtput.setInt(9, 1);//ouL
+                        preparedStmtput.execute();
+                    } else {
+                        //if false entry
+                        responseLa.setText("Select possible Outcome");
+                    }
+                    
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
+            }
+            
+            
             this.setVisible(false);
         } else {
             responseLa.setVisible(true);
