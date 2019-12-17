@@ -137,6 +137,28 @@ public final class Login extends javax.swing.JFrame {
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
+    
+    public static int getUserId(){
+        ResultSet rs = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://db-betting.ci4zazu3dadi.us-east-1.rds.amazonaws.com/table?useSSL=false", "admin", "Teacher1!");
+            
+            String q = "select user_id from account where username=?";
+            PreparedStatement pst = con.prepareStatement(q);
+            pst.setString(1, un);
+            pst.execute();
+            rs = pst.getResultSet();
+            rs.next();
+            return rs.getInt(1);
+            
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+        
+        
+    }
 
     private void LoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginButtonActionPerformed
         un = jTextField1.getText().trim();
